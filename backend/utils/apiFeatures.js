@@ -1,7 +1,7 @@
 class ApiFeatures {
-    constructor(query, querystr) {
+    constructor(query, searchValue) {
         this.query = query;
-        this.querystr = querystr;
+        this.searchValue = searchValue;
     }
 
     search() {
@@ -9,25 +9,25 @@ class ApiFeatures {
         let queryObj = {};
 
         // Check if there's a keyword for name
-        if (this.querystr.keyword) {
+        if (this.searchValue.keyword) {
             queryObj.name = {
-                $regex: this.querystr.keyword,
+                $regex: this.searchValue.keyword,
                 $options: "i"
             };
         }
 
         // Check if there's a price range specified
-        if (this.querystr.price) {
+        if (this.searchValue.price) {
             queryObj.price = {
-                $regex: this.querystr.price,
+                $regex: this.searchValue.price,
                 $options: "i"
             };
         }
 
         // Check if there's a keyword for description
-        if (this.querystr.description) {
+        if (this.searchValue.description) {
             queryObj.description = {
-                $regex: this.querystr.description,
+                $regex: this.searchValue.description,
                 $options: "i"
             };
         }
@@ -38,12 +38,15 @@ class ApiFeatures {
     }
 
     filter(){
-        const copyQuery = {...this.querystr};
-        const removeFields = ["keyword", "price", "description", "limit", "page"];
+        const copyQuery = {...this.searchValue}; console.log("copyQuery", copyQuery);
+        const removeFields = ["keyword", "description", "limit", "page"];
 
         removeFields.forEach((key) => delete copyQuery[key]);
-        console.log(copyQuery);
-        this.query = this.query.find(copyQuery);
+
+        let searchValue = JSON.stringify(copyQuery);
+        searchValue = searchValue.replace(/\b(gt|gte|lt|lte)\b/g, (key) => `$${key}`);
+        console.log("searchValue",searchValue);
+        this.query = this.query.find(JSON.parse(searchValue));
         return this;
     }
 }
