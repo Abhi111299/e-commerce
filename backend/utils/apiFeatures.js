@@ -1,53 +1,38 @@
 class ApiFeatures {
     constructor(query, searchValue) {
-        this.query = query;
-        this.searchValue = searchValue;
+      this.query = query;
+      this.searchValue = searchValue;
     }
-
-    search() {
-        // Initialize an empty query object
-        let queryObj = {};
-
-        // Check if there's a keyword for name
-        if (this.searchValue.keyword) {
-            queryObj.name = {
+  
+    search() {console.log(this.searchValue);
+        const keyword = this.searchValue.keyword
+          ? {
+              name: {
                 $regex: this.searchValue.keyword,
-                $options: "i"
-            };
-        }
-
-        // Check if there's a price range specified
-        if (this.searchValue.price) {
-            queryObj.price = {
-                $regex: this.searchValue.price,
-                $options: "i"
-            };
-        }
-
-        // Check if there's a keyword for description
-        if (this.searchValue.description) {
-            queryObj.description = {
-                $regex: this.searchValue.description,
-                $options: "i"
-            };
-        }
-
-        // Apply the query to the Mongoose query
-        this.query = this.query.find(queryObj);
+                $options: "i",
+              },
+            }
+          : {};
+    
+        this.query = this.query.find({ ...keyword });
         return this;
-    }
-
-    filter(){
-        const copyQuery = {...this.searchValue}; console.log("copyQuery", copyQuery);
-        const removeFields = ["keyword", "description", "limit", "page"];
-
-        removeFields.forEach((key) => delete copyQuery[key]);
-
-        let searchValue = JSON.stringify(copyQuery);
-        searchValue = searchValue.replace(/\b(gt|gte|lt|lte)\b/g, (key) => `$${key}`);
-        console.log("searchValue",searchValue);
-        this.query = this.query.find(JSON.parse(searchValue));
-        return this;
+      }
+  
+    filter() {
+      const queryCopy = { ...this.searchValue };
+      //   Removing some fields for category
+      const removeFields = ["keyword", "page", "limit"];
+  
+      removeFields.forEach((key) => delete queryCopy[key]);
+  
+      // Filter For Price and Rating
+  
+      let searchValue = JSON.stringify(queryCopy);
+      searchValue = searchValue.replace(/\b(gt|gte|lt|lte)\b/g, (key) => `$${key}`);
+  
+      this.query = this.query.find(JSON.parse(searchValue));
+  
+      return this;
     }
 }
 
