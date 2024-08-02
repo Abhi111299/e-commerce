@@ -4,7 +4,7 @@ class ApiFeatures {
       this.searchValue = searchValue;
     }
   
-    search() {console.log(this.searchValue);
+    search() {
         const keyword = this.searchValue.keyword
           ? {
               name: {
@@ -20,19 +20,19 @@ class ApiFeatures {
   
     filter() {
       const queryCopy = { ...this.searchValue };
-      //   Removing some fields for category
       const removeFields = ["keyword", "page", "limit"];
-  
       removeFields.forEach((key) => delete queryCopy[key]);
-  
-      // Filter For Price and Rating
-  
       let searchValue = JSON.stringify(queryCopy);
       searchValue = searchValue.replace(/\b(gt|gte|lt|lte)\b/g, (key) => `$${key}`);
-  
       this.query = this.query.find(JSON.parse(searchValue));
-  
       return this;
+    }
+
+    pagination(resultPerPage){
+        const currentPage = Number(this.searchValue.page) || 1;
+        const skipPage = resultPerPage * (currentPage -1);
+        this.query = this.query.limit(resultPerPage).skip(skipPage);
+        return this;
     }
 }
 
