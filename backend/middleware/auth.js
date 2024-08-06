@@ -7,9 +7,21 @@ exports.isAuthenticatedUser = catchAsyncErrors(async (req,res,next)=> {
     const {token} = req.cookies;
 
     if(!token){
-        return new ErrorHandler("Please login");
+        return next(new ErrorHandler("Please login"));
     }
     const decodeData = jwt.verify(token, process.env.SECRET_KEY);
-    req.user = await User.findById(decodeData.id);
+    
+    req.user = await User.findById(decodeData.id); console.log("userId=>", req.user, decodeData);
     next();
 });
+
+exports.authorizeRole = (...roles) => {
+    return (req, res, next) => {
+
+        if (!roles.includes(req.user.role)) {
+            return next(new ErrorHandler(`Role ${req.user.role} is not allowed to access this resource`, 403));
+        }
+
+        next();
+    }
+};

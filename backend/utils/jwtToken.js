@@ -1,7 +1,8 @@
 // creating jwt token and saving that into cookies
+const { getJWTToken } = require('../utils/helper')
 
 const sendToken = (user,statusCode, res) => {
-    const token = user.getJWTToken();
+    const token = getJWTToken(user._id);
 
     //options fpr cookies
     const options = {
