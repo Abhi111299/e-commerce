@@ -1,9 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-const bcrypt = require('bcryptjs');
-const dotenv = require('dotenv');
-dotenv.config({path: "backend/config/.env"});
-const jwt = require('jsonwebtoken');
+const { hashPassword } = require('../utils/helper')
 
 const userSchema = new mongoose.Schema({
     name:{
@@ -43,20 +40,11 @@ const userSchema = new mongoose.Schema({
 
 });
 
-userSchema.pre("save", async function (next){
-    if(!this.isModified("password")){
+userSchema.pre("save", async function (next) {
+    if (!this.isModified("password")) {
         next();
     }
-    const salt = await bcrypt.genSalt(parseInt(process.env.SALT));
-    this.password = await bcrypt.hash(this.password, salt);
+    this.password = await hashPassword(this.password);
 });
-
-userSchema.methods.getJWTToken = function (){
-    return jwt.sign({id: this._id}, process.env.SECRET_KEY, {expiresIn: process.env.JWT_EXPIRE});
-}
-
-userSchema.methods.comparePassword = async function(password){
-    return await bcrypt.compare(password, this.password)
-}
 
 module.exports = mongoose.model("User", userSchema);
