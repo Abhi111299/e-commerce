@@ -50,15 +50,15 @@ exports.logout = catchAsyncErrors(async (req, res, next) => {
     res.status(201).json({ success: true, message: "User logged out successfully" });
 });
 
-exports.forgotPassword = catchAsyncErrors(async (req, res, next)=>{
-    const user = await user.findOne({emai: req.body.email});
+exports.forgotPassword = catchAsyncErrors(async (req, res, next)=>{ console.log("=========>",user);
+    const user = await user.findOne({email: req.body.email}); console.log(user);
     if(!user){
         return next(new ErrorHandler("User not found!", 404));
     }
     const resetToken = user.getResetTokenPasswordToken(user);
     await user.save({ validationBeforeSave: false});
-    const resetPasswordurl = `${req.protocol}://$${req.get("host")}/api/v1/password/reset/${resetToken}`;
-    const message = `Your password reset token is \n\n ${resetPasswordurl} \n\n If you have not requested this email
+    const resetPasswordUrl = `${req.protocol}://$${req.get("host")}/api/v1/password/reset/${resetToken}`;
+    const message = `Your password reset token is \n\n ${resetPasswordUrl} \n\n If you have not requested this email
     then please ignore it`;
 
     try{
