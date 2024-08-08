@@ -16,7 +16,7 @@ exports.getJWTToken = function (userId) {
     return jwt.sign({ id: userId }, process.env.SECRET_KEY, { expiresIn: process.env.JWT_EXPIRE });
 };
 
-exports.getResetTokenPasswordToken = function(){
+exports.getResetPasswordToken = function(user){ 
     const resetToken = crypto.randomBytes(20).toString('hex');
     user.resetPasswordToken = crypto.createHash("sha256").update(resetToken).toString("hex");
     user.resetPasswordExpire = Date.now() + 15*60*1000;
