@@ -1,5 +1,6 @@
 const auth = require( './docs/auth/index');
 const user = require( './docs/user/index');
+const product = require( './docs/product/index');
 const swaggerDefinition = {
   openapi: '3.0.3',
   info: {
@@ -16,7 +17,7 @@ const swaggerDefinition = {
       description: 'Version-1',
     },
   ],
-  paths: { ...auth, ...user },
+  paths: { ...auth, ...user, ...product },
   components: {
     securitySchemes: {
       bearerAuth: {
