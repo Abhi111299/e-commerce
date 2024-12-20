@@ -5,6 +5,7 @@ const sendToken = require('../utils/jwtToken');
 const { comparePassword, getResetPasswordToken } = require('../utils/helper');
 const sendEmail = require('../utils/sendEmail');
 const crypto = require('crypto');
+const redis = require('../redis'); 
 
 // Register a user
 
@@ -17,6 +18,7 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
             url: "image"
         }
     });
+    await redis.del('users');
 
     sendToken(user, 201, res);
 });
@@ -58,7 +60,7 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next)=>{
         return next(new ErrorHandler("User not found!", 404));
     }
     const resetToken = getResetPasswordToken(user);
-    await user.save({ validationBeforeSave: false});
+    await user.save({ validationBeforeSave: false});console.log("kj;sdfsfwef");
     const resetPasswordUrl = `${req.protocol}://${req.get("host")}/api/v1/password/reset/${resetToken}`;
     const message = `Your password reset token is \n\n ${resetPasswordUrl} \n\n If you have not requested this email, then please ignore it.`;
 
@@ -135,7 +137,7 @@ exports.updatePassword = (catchAsyncErrors(async(req, res, next)=>{
     sendToken(user, 200, res);
 
 }))
-
+ 
 exports.updateProfile = (catchAsyncErrors(async(req, res, next)=>{
     const newUserData = {name: req.body.name, email: req.body.email};
     const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
@@ -148,9 +150,31 @@ exports.updateProfile = (catchAsyncErrors(async(req, res, next)=>{
 }))
 
 exports.getAllUsers = (catchAsyncErrors(async(req, res, next)=>{
-    const user = await User.find({});
+    const cachedUsers = await redis.get('users');  // 'users' is the Redis key
+    console.log(cachedUsers);
+  if (cachedUsers) {
+    // If data is available in cache, send it directly
+    return res.status(200).json({
+      success: true,
+      message: 'Fetched users from cache',
+      count: JSON.parse(cachedUsers).length,
+      users: JSON.parse(cachedUsers),   // Parse the cached string back into an array
+    });
+  }
 
-    res.status(200).json({success: true, message: "Fetched All users successfully", user});
+  // If data is not found in Redis, fetch from MongoDB
+  const users = await User.find({});
+
+  // Cache the users data in Redis with an expiration time (1 hour = 3600 seconds)
+  await redis.setex('users', 3600, JSON.stringify(users));
+
+  // Send the data fetched from the database
+  res.status(200).json({
+    success: true,
+    message: 'Fetched all users successfully from database',
+    count: users.length,
+    users,
+  });
 }))
 
 exports.getSingleUserById = (catchAsyncErrors(async(req, res, next)=>{

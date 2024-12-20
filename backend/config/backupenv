@@ -1,0 +1,11 @@
+PORT=8000
+DB_URI=mongodb://localhost:27017/ecommerce
+SALT=4
+JWT_EXPIRE=10d
+SECRET_KEY=SNFO489KLFSHFA4
+COOKIE_EXPIRE=5
+JWT_SECRET_KEY = decatlog@12345
+SMTP_MAIL=aniketgupta09854@gmail.com
+SMTP_PASSWORD=mtdtdkgsvxfbpqog
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587 
