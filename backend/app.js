@@ -10,7 +10,6 @@ const order = require('./routes/orderRoute');
 const  swaggerJsDoc = require ('swagger-jsdoc');
 const swaggerUi = require( 'swagger-ui-express');
 const swaggerDefinition = require( '../backend/swagger/swaggerDefinition');
-// const { swaggerUi, swaggerSpec } = require('../backend/swagger1/swaggerConfig');
 app.use('/api/v1', user);
 app.use('/api/v1', products);
 app.use('/api/v1', order);
