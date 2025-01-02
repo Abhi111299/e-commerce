@@ -1,12 +1,12 @@
-const productComponent = require('./components');
+const orderComponent = require('./components');
 const {
     components: {
-      schemas: { createProduct, getAuthResponse, updateProduct, getProductDetails },
+      schemas: { createProduct, getAuthResponse, updateProduct },
     },
-  } = productComponent;
+  } = orderComponent;
 
 
-const products = {
+const orders = {
     '/admin/products/create': {
       post: {
         tags: ['Product'],
@@ -146,45 +146,7 @@ const products = {
         },
         },
     },
-    '/products/{id}':{
-      get: {
-        tags: ['Product'],
-        summary: 'Get single product',
-        description: 'Get fetched products.',
-        operationId: 'single_product',
-        parameters: [
-          {
-              name: 'id',
-              in: 'path',
-              required: true,
-              description: 'ID of the product to fetch',
-              schema: {
-                  type: 'string',
-                  example: '66c6cad547138d7e5f0e2762',
-              },
-          },
-      ],
-        responses: {
-          200: {
-            content: {
-              'application/json': {
-                schema: getAuthResponse,
-              },
-            },
-            description: 'Single product fetched successfully',
-          },
-          500: {
-            content: {
-              'application/json': {
-                schema: getAuthResponse,
-              },
-            },
-          },
-        },
-      },
-
-    }
 };
   
-  module.exports = products;
+  module.exports = orders;
   
